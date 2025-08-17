@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Research Assumptions Mapping Template</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f8f9fa;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .usage-notes {
+            background: #e8f4fd;
+            border-left: 4px solid #0066cc;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .usage-notes h3 {
+            color: #0066cc;
+            margin-bottom: 10px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            min-width: 1000px;
+        }
+
+        th {
+            background: #f8f9fa;
+            color: #495057;
+            font-weight: 600;
+            padding: 15px 12px;
+            text-align: left;
+            border-bottom: 2px solid #dee2e6;
+            font-size: 0.95em;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #dee2e6;
+            vertical-align: top;
+            font-size: 0.9em;
+        }
+
+        .example-row {
+            background: #f8f9ff;
+        }
+
+        .domain-col { width: 12%; }
+        .assumption-col { width: 20%; }
+        .testable-col { width: 10%; }
+        .risk-col { width: 15%; }
+        .evidence-col { width: 18%; }
+        .measurement-col { width: 15%; }
+        .edge-case-col { width: 10%; }
+
+        .add-row-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin: 10px 0;
+            transition: background 0.2s;
+        }
+
+        .add-row-btn:hover {
+            background: #218838;
+        }
+
+        .instructions {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 20px;
+            margin-top: 30px;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .instructions h3 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .instructions ul {
+            margin-left: 20px;
+        }
+
+        .instructions li {
+            margin-bottom: 5px;
+        }
+
+        .editable {
+            min-height: 20px;
+            border: 1px dashed transparent;
+            padding: 4px;
+            border-radius: 2px;
+        }
+
+        .editable:hover {
+            border-color: #007bff;
+            background: #f8f9ff;
+        }
+
+        .editable:focus {
+            outline: none;
+            border-color: #007bff;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Research Assumptions Mapping Template</h1>
+            <p>A framework for systematically analyzing and validating research assumptions</p>
+        </div>
+        
+        <div class="content">
+            <div class="usage-notes">
+                <h3>Purpose</h3>
+                <p>This template helps researchers map out their core assumptions, identify validation needs, and anticipate potential failure points. Use this as a foundation for building robust research methodologies while maintaining awareness of edge cases and measurement challenges.</p>
+            </div>
+
+            <div class="table-container">
+                <table id="assumptionsTable">
+                    <thead>
+                        <tr>
+                            <th class="domain-col">Domain/Area</th>
+                            <th class="assumption-col">Assumption Statement</th>
+                            <th class="testable-col">Testable?</th>
+                            <th class="risk-col">Risk Level</th>
+                            <th class="evidence-col">Evidence Type Needed</th>
+                            <th class="measurement-col">Measurement Approach</th>
+                            <th class="edge-case-col">Edge Case Vulnerability</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="example-row">
+                            <td class="editable" contenteditable="true">Measurement Framework</td>
+                            <td class="editable" contenteditable="true">Our chosen metrics capture meaningful behavioral variation</td>
+                            <td class="editable" contenteditable="true">Yes</td>
+                            <td class="editable" contenteditable="true">High - Framework validity depends on this</td>
+                            <td class="editable" contenteditable="true">Statistical correlation with observed phenomena</td>
+                            <td class="editable" contenteditable="true">Variance analysis, correlation testing</td>
+                            <td class="editable" contenteditable="true">Extreme values, novel contexts</td>
+                        </tr>
+                        <tr class="example-row">
+                            <td class="editable" contenteditable="true">Temporal Stability</td>
+                            <td class="editable" contenteditable="true">The phenomenon we're studying changes predictably over time</td>
+                            <td class="editable" contenteditable="true">Yes</td>
+                            <td class="editable" contenteditable="true">Medium - Affects detection timing</td>
+                            <td class="editable" contenteditable="true">Longitudinal data, trend analysis</td>
+                            <td class="editable" contenteditable="true">Time series analysis, change detection</td>
+                            <td class="editable" contenteditable="true">Sudden discontinuities, external shocks</td>
+                        </tr>
+                        <tr>
+                            <td class="editable" contenteditable="true">Click to add domain...</td>
+                            <td class="editable" contenteditable="true">Click to add assumption...</td>
+                            <td class="editable" contenteditable="true">Yes/No/Partial</td>
+                            <td class="editable" contenteditable="true">High/Medium/Low</td>
+                            <td class="editable" contenteditable="true">Click to add evidence type...</td>
+                            <td class="editable" contenteditable="true">Click to add measurement approach...</td>
+                            <td class="editable" contenteditable="true">Click to add edge cases...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <button class="add-row-btn" onclick="addRow()">+ Add New Assumption Row</button>
+
+            <div class="instructions">
+                <h3>Usage Instructions</h3>
+                <ul>
+                    <li><strong>Domain/Area:</strong> What aspect of your research this assumption covers (e.g., "Data Collection", "User Behavior", "System Performance")</li>
+                    <li><strong>Assumption Statement:</strong> The specific belief or premise you're operating from</li>
+                    <li><strong>Testable:</strong> Whether this assumption can be validated empirically (Yes/No/Partial)</li>
+                    <li><strong>Risk Level:</strong> What happens if this assumption is wrong (High/Medium/Low impact)</li>
+                    <li><strong>Evidence Type Needed:</strong> What kind of data or proof would validate or invalidate this assumption</li>
+                    <li><strong>Measurement Approach:</strong> Specific methods or tools you could use to test this assumption</li>
+                    <li><strong>Edge Case Vulnerability:</strong> Conditions where this assumption might break down or fail</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function addRow() {
+            const table = document.getElementById('assumptionsTable').getElementsByTagName('tbody')[0];
+            const newRow = table.insertRow();
+            
+            const cells = [
+                'Click to add domain...',
+                'Click to add assumption...',
+                'Yes/No/Partial',
+                'High/Medium/Low',
+                'Click to add evidence type...',
+                'Click to add measurement approach...',
+                'Click to add edge cases...'
+            ];
+            
+            cells.forEach(cellText => {
+                const cell = newRow.insertCell();
+                cell.className = 'editable';
+                cell.contentEditable = 'true';
+                cell.textContent = cellText;
+            });
+        }
+
+        // Save data to localStorage when content changes
+        document.addEventListener('input', function(e) {
+            if (e.target.classList.contains('editable')) {
+                const tableData = [];
+                const rows = document.querySelectorAll('#assumptionsTable tbody tr');
+                
+                rows.forEach(row => {
+                    const cells = row.querySelectorAll('.editable');
+                    const rowData = Array.from(cells).map(cell => cell.textContent);
+                    tableData.push(rowData);
+                });
+                
+                // Note: localStorage not supported in Claude artifacts
+                // This would work in a real environment:
+                // localStorage.setItem('assumptionsData', JSON.stringify(tableData));
+            }
+        });
+    </script>
+</body>
+</html>
