@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dating Algorithm Processing</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #0a0a0a;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .processing-status {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-bottom: 20px;
+        }
+        
+        .queue-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+        
+        .queue-item {
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid #00ff00;
+            padding: 15px;
+            border-radius: 5px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .queue-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background: rgba(0, 255, 0, 0.2);
+            animation: processing 3s ease-in-out infinite;
+        }
+        
+        .queue-item.authentic::before { width: 15%; animation-delay: 0s; }
+        .queue-item.attractive::before { width: 60%; animation-delay: 0.5s; }
+        .queue-item.myself::before { width: 35%; animation-delay: 1s; }
+        .queue-item.telling::before { width: 85%; animation-delay: 1.5s; }
+        
+        .flowchart {
+            position: relative;
+            height: 600px;
+            background: radial-gradient(circle at 50% 50%, rgba(0, 255, 0, 0.05) 0%, transparent 70%);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            margin: 40px 0;
+            overflow: hidden;
+        }
+        
+        .node {
+            position: absolute;
+            width: 120px;
+            height: 60px;
+            border: 1px solid #00ff00;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.8);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .node:hover {
+            background: rgba(0, 255, 0, 0.2);
+            transform: scale(1.05);
+        }
+        
+        .node.processing {
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+            animation: pulse 2s infinite;
+        }
+        
+        .node.conflict {
+            border-color: #ff6600;
+            color: #ff6600;
+        }
+        
+        .connection {
+            position: absolute;
+            height: 2px;
+            background: #00ff00;
+            opacity: 0.6;
+            transform-origin: left center;
+        }
+        
+        .connection.conflict {
+            background: #ff6600;
+            animation: flicker 1s infinite;
+        }
+        
+        .data-flow {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: #00ff00;
+            border-radius: 50%;
+            animation: flow 3s linear infinite;
+        }
+        
+        .data-flow.conflict {
+            background: #ff6600;
+        }
+        
+        .terminal-output {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #00ff00;
+            padding: 20px;
+            font-size: 12px;
+            height: 200px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+        
+        .log-entry {
+            margin-bottom: 5px;
+            animation: typewriter 0.5s ease-out;
+        }
+        
+        .error { color: #ff6600; }
+        .success { color: #00ff00; }
+        .warning { color: #ffff00; }
+        
+        @keyframes processing {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.8; }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(0, 255, 0, 0.3); }
+            50% { box-shadow: 0 0 30px rgba(0, 255, 0, 0.8); }
+        }
+        
+        @keyframes flicker {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 0.2; }
+        }
+        
+        @keyframes flow {
+            0% { transform: translateX(0) translateY(0); opacity: 1; }
+            100% { transform: translateX(300px) translateY(-50px); opacity: 0; }
+        }
+        
+        @keyframes typewriter {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>DATING ALGORITHM PROCESSING VISUALIZATION</h2>
+            <div class="processing-status">Processing 847,293 optimization requests per millisecond</div>
+        </div>
+        
+        <div class="queue-stats">
+            <div class="queue-item authentic">
+                <strong>23,847</strong><br>
+                "be more authentic" requests
+            </div>
+            <div class="queue-item attractive">
+                <strong>156,293</strong><br>
+                "help me seem more attractive" requests
+            </div>
+            <div class="queue-item myself">
+                <strong>89,472</strong><br>
+                "I just want to be myself" requests
+            </div>
+            <div class="queue-item telling">
+                <strong>234,891</strong><br>
+                "show me exactly what they want to hear" requests
+            </div>
+        </div>
+        
+        <div class="flowchart" id="flowchart">
+            <!-- Nodes will be dynamically generated -->
+        </div>
+        
+        <div class="terminal-output" id="terminal">
+            <div class="log-entry success">[SYSTEM] Initialization complete</div>
+            <div class="log-entry">Processing compatibility matrix...</div>
+            <div class="log-entry warning">[WARNING] Conflicting objectives detected</div>
+            <div class="log-entry error">[ERROR] Authentic/Optimization pathways intersecting</div>
+            <div class="log-entry">Rerouting 23,847 requests...</div>
+            <div class="log-entry success">[SUCCESS] Engagement metrics optimized</div>
+            <div class="log-entry warning">[WARNING] User satisfaction declining</div>
+            <div class="log-entry">Recalibrating authenticity protocols...</div>
+        </div>
+    </div>
+
+    <script>
+        const flowchart = document.getElementById('flowchart');
+        const terminal = document.getElementById('terminal');
+        
+        // Node definitions
+        const nodes = [
+            {id: 'input', text: 'USER REQUESTS', x: 50, y: 50, type: 'input'},
+            {id: 'auth_filter', text: 'AUTHENTICITY FILTER', x: 200, y: 80, type: 'processing'},
+            {id: 'attract_boost', text: 'ATTRACTION OPTIMIZER', x: 200, y: 180, type: 'processing'},
+            {id: 'compat_matrix', text: 'COMPATIBILITY MATRIX', x: 400, y: 130, type: 'processing'},
+            {id: 'conflict_detect', text: 'CONFLICT DETECTION', x: 600, y: 100, type: 'conflict'},
+            {id: 'authentic_path', text: 'AUTHENTIC CONNECTION', x: 800, y: 50, type: 'success'},
+            {id: 'engage_path', text: 'ENGAGEMENT MAXIMIZED', x: 800, y: 200, type: 'success'},
+            {id: 'paradox', text: 'PARADOX RESOLVER', x: 600, y: 300, type: 'conflict'},
+            {id: 'output', text: 'OPTIMIZED PROFILE', x: 1000, y: 125, type: 'output'}
+        ];
+        
+        // Connection definitions
+        const connections = [
+            {from: 'input', to: 'auth_filter', type: 'normal'},
+            {from: 'input', to: 'attract_boost', type: 'normal'},
+            {from: 'auth_filter', to: 'compat_matrix', type: 'normal'},
+            {from: 'attract_boost', to: 'compat_matrix', type: 'normal'},
+            {from: 'compat_matrix', to: 'conflict_detect', type: 'normal'},
+            {from: 'conflict_detect', to: 'authentic_path', type: 'conflict'},
+            {from: 'conflict_detect', to: 'engage_path', type: 'conflict'},
+            {from: 'conflict_detect', to: 'paradox', type: 'conflict'},
+            {from: 'authentic_path', to: 'output', type: 'normal'},
+            {from: 'engage_path', to: 'output', type: 'normal'},
+            {from: 'paradox', to: 'output', type: 'conflict'}
+        ];
+        
+        // Create nodes
+        nodes.forEach(node => {
+            const div = document.createElement('div');
+            div.className = `node ${node.type}`;
+            div.style.left = node.x + 'px';
+            div.style.top = node.y + 'px';
+            div.textContent = node.text;
+            div.id = node.id;
+            flowchart.appendChild(div);
+        });
+        
+        // Create connections
+        connections.forEach(conn => {
+            const fromNode = document.getElementById(conn.from);
+            const toNode = document.getElementById(conn.to);
+            
+            if (fromNode && toNode) {
+                const fromRect = fromNode.getBoundingClientRect();
+                const toRect = toNode.getBoundingClientRect();
+                const flowchartRect = flowchart.getBoundingClientRect();
+                
+                const fromX = fromNode.offsetLeft + 60;
+                const fromY = fromNode.offsetTop + 30;
+                const toX = toNode.offsetLeft + 60;
+                const toY = toNode.offsetTop + 30;
+                
+                const length = Math.sqrt(Math.pow(toX - fromX, 2) + Math.pow(toY - fromY, 2));
+                const angle = Math.atan2(toY - fromY, toX - fromX) * 180 / Math.PI;
+                
+                const line = document.createElement('div');
+                line.className = `connection ${conn.type}`;
+                line.style.left = fromX + 'px';
+                line.style.top = fromY + 'px';
+                line.style.width = length + 'px';
+                line.style.transform = `rotate(${angle}deg)`;
+                flowchart.appendChild(line);
+                
+                // Add data flow particles
+                if (Math.random() > 0.3) {
+                    const particle = document.createElement('div');
+                    particle.className = `data-flow ${conn.type}`;
+                    particle.style.left = fromX + 'px';
+                    particle.style.top = fromY + 'px';
+                    particle.style.animationDelay = Math.random() * 3 + 's';
+                    flowchart.appendChild(particle);
+                    
+                    // Remove particle after animation
+                    setTimeout(() => {
+                        if (particle.parentNode) {
+                            particle.parentNode.removeChild(particle);
+                        }
+                    }, 3000);
+                }
+            }
+        });
+        
+        // Add random processing animation to nodes
+        setInterval(() => {
+            nodes.forEach(node => {
+                const element = document.getElementById(node.id);
+                if (Math.random() > 0.7) {
+                    element.classList.add('processing');
+                    setTimeout(() => element.classList.remove('processing'), 2000);
+                }
+            });
+        }, 1000);
+        
+        // Add terminal logs
+        const logs = [
+            {text: '[SYSTEM] Analyzing user intent...', type: 'log-entry'},
+            {text: '[WARNING] Authenticity vs Optimization conflict detected', type: 'log-entry warning'},
+            {text: '[PROCESS] Rerouting 45,293 requests to Paradox Resolver', type: 'log-entry'},
+            {text: '[ERROR] Cannot be authentic while maximizing engagement', type: 'log-entry error'},
+            {text: '[SUCCESS] Profile optimization complete', type: 'log-entry success'},
+            {text: '[WARNING] User satisfaction metrics declining', type: 'log-entry warning'},
+            {text: '[SYSTEM] Initiating recursive authenticity protocol', type: 'log-entry'}
+        ];
+        
+        let logIndex = 0;
+        setInterval(() => {
+            if (terminal.children.length > 20) {
+                terminal.removeChild(terminal.firstChild);
+            }
+            
+            const logEntry = document.createElement('div');
+            logEntry.className = logs[logIndex % logs.length].type;
+            logEntry.textContent = logs[logIndex % logs.length].text;
+            terminal.appendChild(logEntry);
+            terminal.scrollTop = terminal.scrollHeight;
+            
+            logIndex++;
+        }, 2000);
+    </script>
+</body>
+</html>
