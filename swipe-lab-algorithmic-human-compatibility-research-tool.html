@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Swipe Lab™ - Quality Analysis</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin: 0;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .header p {
+            color: #7f8c8d;
+            font-size: 1.1em;
+            margin: 10px 0;
+        }
+        
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 30px;
+            justify-content: center;
+        }
+        
+        .match-toggle {
+            display: flex;
+            align-items: center;
+            background: white;
+            padding: 10px 15px;
+            border-radius: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .match-toggle:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        
+        .match-toggle.active {
+            border-color: var(--match-color);
+            background: var(--match-color);
+            color: white;
+        }
+        
+        .match-toggle input {
+            margin-right: 8px;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 600px;
+            margin: 30px 0;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        
+        .stat-card h3 {
+            color: #2c3e50;
+            margin: 0 0 15px 0;
+            font-size: 1.2em;
+        }
+        
+        .category-weights {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .category-weights h3 {
+            color: #2c3e50;
+            margin: 0 0 15px 0;
+        }
+        
+        .weight-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+            padding: 5px 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .export-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .export-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Swipe Lab™</h1>
+            <p>Algorithmic Quality vs. Human Quality Analysis</p>
+            <p><em>Data-driven insights into dating app matching patterns</em></p>
+        </div>
+        
+        <div class="category-weights">
+            <h3>📊 Weighted Category System</h3>
+            <div class="weight-item">
+                <strong>Intellectual Engagement</strong>
+                <span>25% - Research Interest, Leadership, Confidence</span>
+            </div>
+            <div class="weight-item">
+                <strong>Lifestyle Compatibility</strong>
+                <span>30% - FIRE Goals, Remote Work, Travel Plans</span>
+            </div>
+            <div class="weight-item">
+                <strong>Platform Behavior</strong>
+                <span>20% - Chat Patterns, Profile Quality, Engagement</span>
+            </div>
+            <div class="weight-item">
+                <strong>Connection Quality</strong>
+                <span>15% - Communication Depth, Mutual Interests</span>
+            </div>
+            <div class="weight-item">
+                <strong>Demographic Alignment</strong>
+                <span>10% - Age Range, Education, Relationship Goals</span>
+            </div>
+        </div>
+        
+        <div class="controls" id="matchToggles">
+            <!-- Dynamic toggles will be inserted here -->
+        </div>
+        
+        <div class="chart-container">
+            <canvas id="radarChart"></canvas>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>🎯 Key Insights</h3>
+                <div id="insights">
+                    <!-- Dynamic insights will be inserted here -->
+                </div>
+            </div>
+            <div class="stat-card">
+                <h3>📈 Quality Metrics</h3>
+                <div id="qualityMetrics">
+                    <!-- Dynamic metrics will be inserted here -->
+                </div>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 30px;">
+            <button class="export-btn" onclick="exportData()">📊 Export Analysis</button>
+            <button class="export-btn" onclick="exportChart()">🎨 Save Chart</button>
+        </div>
+    </div>
+
+    <script>
+        // Data from CSV analysis
+        const matchData = [
+            {
+                name: "PERSON A",
+                scores: {
+                    "LIKED YOU": 5, "PEOPLE": 0, "DISCOVER": 0, "CHAT - MATCH INITIATED": 0, "CHAT - USER INITIATED": 5,
+                    "PROFILE COMPLETE": 5, "ABOVE 6'1": 3, "ATTRACTIVE": 2.5, "NERDY": 4.5, "FIT": 3.5,
+                    "SMILE": 4, "EYE CONTACT": 5, "LIBIDO DRIVEN": 2, "EXECUTOR": 3.5, "MIRROR MAN": 5,
+                    "PROTECTOR": 0, "CONNECTOR": 2.5, "EMOTIONAL ANCHOR": 2.5, "WINGMAN": 3.5, "FREELANCE/REMOTE": 0,
+                    "TRAD JOB": 5, "2026 TRAVEL PLANS": 2, "TRAVEL HIST": 2, "EDU": 4, "33-38": 5,
+                    "WANTS KIDS": 5, "LTR": 5, "INTESTED IN MY RESEARCH": 2, "LEADERSHIP": 2, "CONFIDENCE": 4,
+                    "FIRE GOALS": 0, "MUTUAL INTERESTS": 2, "DISTANCE": 2.5, "MOVES REL FWD": 0
+                }
+            },
+            {
+                name: "PERSON B",
+                scores: {
+                    "LIKED YOU": 0, "PEOPLE": 5, "DISCOVER": 0, "CHAT - MATCH INITIATED": 0, "CHAT - USER INITIATED": 5,
+                    "PROFILE COMPLETE": 5, "ABOVE 6'1": 5, "ATTRACTIVE": 3, "NERDY": 1, "FIT": 2.5,
+                    "SMILE": 2, "EYE CONTACT": 1, "LIBIDO DRIVEN": 5, "EXECUTOR": 2, "MIRROR MAN": 3.5,
+                    "PROTECTOR": 3.5, "CONNECTOR": 0, "EMOTIONAL ANCHOR": 0, "WINGMAN": 0, "FREELANCE/REMOTE": 5,
+                    "TRAD JOB": 0, "2026 TRAVEL PLANS": 5, "TRAVEL HIST": 5, "EDU": 1, "33-38": 5,
+                    "WANTS KIDS": 1, "LTR": 2.5, "INTESTED IN MY RESEARCH": 2.5, "LEADERSHIP": 1, "CONFIDENCE": 3,
+                    "FIRE GOALS": 2, "MUTUAL INTERESTS": 2, "DISTANCE": 2.5, "MOVES REL FWD": 2.5
+                }
+            },
+            {
+                name: "PERSON C",
+                scores: {
+                    "LIKED YOU": 5, "PEOPLE": 0, "DISCOVER": 0, "CHAT - MATCH INITIATED": 5, "CHAT - USER INITIATED": 0,
+                    "PROFILE COMPLETE": 5, "ABOVE 6'1": 1, "ATTRACTIVE": 2, "NERDY": 5, "FIT": 2,
+                    "SMILE": 3, "EYE CONTACT": 4, "LIBIDO DRIVEN": 4, "EXECUTOR": 2, "MIRROR MAN": 3.5,
+                    "PROTECTOR": 0, "CONNECTOR": 3, "EMOTIONAL ANCHOR": 0, "WINGMAN": 0, "FREELANCE/REMOTE": 4,
+                    "TRAD JOB": 1, "2026 TRAVEL PLANS": 0, "TRAVEL HIST": 0, "EDU": 5, "26-32": 5,
+                    "WANTS KIDS": 5, "LTR": 5, "INTESTED IN MY RESEARCH": 5, "LEADERSHIP": 3, "CONFIDENCE": 3,
+                    "FIRE GOALS": 0, "MUTUAL INTERESTS": 4, "DISTANCE": 2.5, "MOVES REL FWD": 5
+                }
+            },
+            {
+                name: "PERSON D",
+                scores: {
+                    "LIKED YOU": 5, "PEOPLE": 0, "DISCOVER": 0, "CHAT - MATCH INITIATED": 5, "CHAT - USER INITIATED": 0,
+                    "PROFILE COMPLETE": 5, "ABOVE 6'1": 1, "ATTRACTIVE": 4, "NERDY": 2.5, "FIT": 4.5,
+                    "SMILE": 5, "EYE CONTACT": 5, "LIBIDO DRIVEN": 3, "EXECUTOR": 4, "MIRROR MAN": 2,
+                    "PROTECTOR": 4, "CONNECTOR": 5, "EMOTIONAL ANCHOR": 4, "WINGMAN": 3, "FREELANCE/REMOTE": 5,
+                    "TRAD JOB": 0, "2026 TRAVEL PLANS": 0, "TRAVEL HIST": 0, "EDU": 2, "33-38": 5,
+                    "WANTS KIDS": 5, "LTR": 5, "INTESTED IN MY RESEARCH": 1, "LEADERSHIP": 4, "CONFIDENCE": 5,
+                    "FIRE GOALS": 2, "MUTUAL INTERESTS": 3, "DISTANCE": 0, "MOVES REL FWD": 1
+                }
+            },
+            {
+                name: "ME",
+                scores: {
+                    "LIKED YOU": 5, "PEOPLE": 3, "DISCOVER": 4, "CHAT - MATCH INITIATED": 5, "CHAT - USER INITIATED": 5,
+                    "PROFILE COMPLETE": 5, "ABOVE 6'1": 0, "ATTRACTIVE": 4, "NERDY": 5, "FIT": 3,
+                    "SMILE": 4.5, "EYE CONTACT": 4, "LIBIDO DRIVEN": 3, "EXECUTOR": 5, "MIRROR MAN": 2,
+                    "PROTECTOR": 3, "CONNECTOR": 4, "EMOTIONAL ANCHOR": 4, "WINGMAN": 3, "FREELANCE/REMOTE": 5,
+                    "TRAD JOB": 0, "2026 TRAVEL PLANS": 5, "TRAVEL HIST": 5, "EDU": 5, "33-38": 0,
+                    "WANTS KIDS": 5, "LTR": 5, "INTESTED IN MY RESEARCH": 5, "LEADERSHIP": 5, "CONFIDENCE": 4,
+                    "FIRE GOALS": 4, "MUTUAL INTERESTS": 4, "DISTANCE": 3, "MOVES REL FWD": 4
+                }
+            }
+        ];
+
+        // Refined category mapping with weights
+        const categoryMap = {
+            'Intellectual Engagement': {
+                weight: 0.25,
+                metrics: ['INTESTED IN MY RESEARCH', 'LEADERSHIP', 'CONFIDENCE', 'NERDY', 'EDU']
+            },
+            'Lifestyle Compatibility': {
+                weight: 0.30,
+                metrics: ['FIRE GOALS', 'FREELANCE/REMOTE', '2026 TRAVEL PLANS', 'TRAVEL HIST', 'WANTS KIDS', 'LTR']
+            },
+            'Platform Behavior': {
+                weight: 0.20,
+                metrics: ['CHAT - USER INITIATED', 'PROFILE COMPLETE', 'LIKED YOU', 'PEOPLE', 'MOVES REL FWD']
+            },
+            'Connection Quality': {
+                weight: 0.15,
+                metrics: ['MUTUAL INTERESTS', 'CONNECTOR', 'EMOTIONAL ANCHOR', 'DISTANCE']
+            },
+            'Demographic Alignment': {
+                weight: 0.10,
+                metrics: ['33-38', '26-32', 'ABOVE 6\'1', 'ATTRACTIVE']
+            }
+        };
+
+        // Colors for each match
+        const colors = [
+            'rgba(255, 99, 132, 0.8)',   // Red - Person A
+            'rgba(54, 162, 235, 0.8)',   // Blue - Person B
+            'rgba(255, 205, 86, 0.8)',   // Yellow - Person C
+            'rgba(75, 192, 192, 0.8)',   // Green - Person D
+            'rgba(153, 102, 255, 0.8)'   // Purple - ME
+        ];
+
+        let chart;
+        let activeMatches = new Set(['PERSON A', 'PERSON B', 'PERSON C', 'PERSON D', 'ME']);
+
+        function calculateCategoryScore(match, category) {
+            const metrics = categoryMap[category].metrics;
+            let total = 0;
+            let count = 0;
+            
+            metrics.forEach(metric => {
+                if (match.scores[metric] !== undefined) {
+                    total += match.scores[metric];
+                    count++;
+                }
+            });
+            
+            return count > 0 ? total / count : 0;
+        }
+
+        function createChart() {
+            const ctx = document.getElementById('radarChart').getContext('2d');
+            const categories = Object.keys(categoryMap);
+            
+            const datasets = matchData
+                .filter(match => activeMatches.has(match.name))
+                .map((match, index) => {
+                    const data = categories.map(category => 
+                        calculateCategoryScore(match, category)
+                    );
+                    
+                    return {
+                        label: match.name,
+                        data: data,
+                        backgroundColor: colors[index].replace('0.8', '0.2'),
+                        borderColor: colors[index],
+                        borderWidth: 3,
+                        pointBackgroundColor: colors[index],
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 6,
+                        pointHoverRadius: 8
+                    };
+                });
+
+            if (chart) {
+                chart.destroy();
+            }
+
+            chart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: categories,
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Algorithmic Quality vs. Human Quality Analysis',
+                            font: { size: 18, weight: 'bold' }
+                        },
+                        legend: {
+                            position: 'bottom',
+                            labels: { padding: 20, font: { size: 14 } }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: ${context.parsed.r.toFixed(1)}/5.0`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 5,
+                            ticks: {
+                                stepSize: 1,
+                                font: { size: 12 }
+                            },
+                            pointLabels: {
+                                font: { size: 13, weight: 'bold' }
+                            },
+                            grid: { color: 'rgba(0,0,0,0.1)' }
+                        }
+                    },
+                    animation: {
+                        duration: 1000,
+                        easing: 'easeOutQuart'
+                    }
+                }
+            });
+        }
+
+        function createToggles() {
+            const container = document.getElementById('matchToggles');
+            container.innerHTML = '';
+            
+            matchData.forEach((match, index) => {
+                const toggle = document.createElement('div');
+                toggle.className = `match-toggle ${activeMatches.has(match.name) ? 'active' : ''}`;
+                toggle.style.setProperty('--match-color', colors[index]);
+                
+                toggle.innerHTML = `
+                    <input type="checkbox" ${activeMatches.has(match.name) ? 'checked' : ''} 
+                           onchange="toggleMatch('${match.name}')">
+                    <span>${match.name}</span>
+                `;
+                
+                container.appendChild(toggle);
+            });
+        }
+
+        function toggleMatch(matchName) {
+            if (activeMatches.has(matchName)) {
+                activeMatches.delete(matchName);
+            } else {
+                activeMatches.add(matchName);
+            }
+            createChart();
+            createToggles();
+            updateInsights();
+        }
+
+        function updateInsights() {
+            const insights = document.getElementById('insights');
+            const qualityMetrics = document.getElementById('qualityMetrics');
+            
+            const activeMatchData = matchData.filter(match => activeMatches.has(match.name));
+            
+            // Generate insights
+            let insightsHtml = '';
+            if (activeMatchData.length > 0) {
+                const avgScores = Object.keys(categoryMap).map(category => {
+                    const avg = activeMatchData.reduce((sum, match) => 
+                        sum + calculateCategoryScore(match, category), 0) / activeMatchData.length;
+                    return { category, score: avg };
+                });
+                
+                const strongest = avgScores.reduce((max, curr) => curr.score > max.score ? curr : max);
+                const weakest = avgScores.reduce((min, curr) => curr.score < min.score ? curr : min);
+                
+                insightsHtml = `
+                    <p><strong>Strongest Area:</strong> ${strongest.category} (${strongest.score.toFixed(1)}/5.0)</p>
+                    <p><strong>Improvement Area:</strong> ${weakest.category} (${weakest.score.toFixed(1)}/5.0)</p>
+                    <p><strong>Sample Size:</strong> ${activeMatchData.length} matches analyzed</p>
+                `;
+            }
+            
+            insights.innerHTML = insightsHtml;
+            
+            // Generate quality metrics
+            let metricsHtml = '';
+            if (activeMatchData.length > 0) {
+                const totalWeightedScore = activeMatchData.map(match => {
+                    let weightedSum = 0;
+                    Object.entries(categoryMap).forEach(([category, config]) => {
+                        const score = calculateCategoryScore(match, category);
+                        weightedSum += score * config.weight;
+                    });
+                    return { name: match.name, score: weightedSum };
+                });
+                
+                totalWeightedScore.sort((a, b) => b.score - a.score);
+                
+                metricsHtml = '<h4>🏆 Overall Quality Ranking:</h4>';
+                totalWeightedScore.forEach((match, index) => {
+                    metricsHtml += `<p>${index + 1}. ${match.name}: ${match.score.toFixed(2)}/5.0</p>`;
+                });
+            }
+            
+            qualityMetrics.innerHTML = metricsHtml;
+        }
+
+        function exportData() {
+            const data = {
+                matches: matchData,
+                categories: categoryMap,
+                analysis: 'Swipe Lab™ - Algorithmic vs Human Quality Analysis'
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'swipe-lab-analysis.json';
+            a.click();
+        }
+
+        function exportChart() {
+            const canvas = document.getElementById('radarChart');
+            const url = canvas.toDataURL('image/png');
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'swipe-lab-radar-chart.png';
+            a.click();
+        }
+
+        // Initialize
+        createChart();
+        createToggles();
+        updateInsights();
+    </script>
+</body>
+</html>
